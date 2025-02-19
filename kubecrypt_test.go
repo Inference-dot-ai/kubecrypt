@@ -26,14 +26,16 @@ func TestEncryptDecrypt(t *testing.T) {
 				t.Fatalf("Generated key has wrong size: expected %d, got %d", size, len(key))
 			}
 
+			key64 := KeyToBase64(key)
+
 			// Encrypt
-			encrypted, err := Encrypt(plaintext, key)
+			encrypted, err := Encrypt(plaintext, key64)
 			if err != nil {
 				t.Fatalf("Encryption failed: %v", err)
 			}
 
 			// Decrypt
-			decrypted, err := Decrypt(encrypted, key)
+			decrypted, err := Decrypt(encrypted, key64)
 			if err != nil {
 				t.Fatalf("Decryption failed: %v", err)
 			}
@@ -166,8 +168,10 @@ func TestInvalidInputs(t *testing.T) {
 	// Generate valid key for further tests
 	key, _ := GenerateKey(32)
 
+	key64 := KeyToBase64(key)
+
 	// Test too short ciphertext
-	_, err = Decrypt("SGVsbG8=", key) // "Hello" in base64
+	_, err = Decrypt("SGVsbG8=", key64) // "Hello" in base64
 	if err == nil {
 		t.Fatal("Expected error for short ciphertext, got nil")
 	}
@@ -183,9 +187,10 @@ func TestInvalidInputs(t *testing.T) {
 
 	// Test wrong key for decryption
 	plaintext := []byte("Test data")
-	encrypted, _ := Encrypt(plaintext, key)
+	encrypted, _ := Encrypt(plaintext, key64)
 	wrongKey, _ := GenerateKey(32)
-	_, err = Decrypt(encrypted, wrongKey)
+	wrongKey64 := KeyToBase64(wrongKey)
+	_, err = Decrypt(encrypted, wrongKey64)
 	if err == nil {
 		t.Fatal("Expected error when decrypting with wrong key, got nil")
 	}
@@ -221,7 +226,8 @@ func TestIsEncryptedText(t *testing.T) {
 
 	// Generate a valid encrypted text for the last test case
 	key, _ := GenerateKey(32)
-	encrypted, _ := Encrypt([]byte("Test kubeconfig data"), key)
+	key64 := KeyToBase64(key)
+	encrypted, _ := Encrypt([]byte("Test kubeconfig data"), key64)
 	testCases[3].input = encrypted
 
 	for _, tc := range testCases {
@@ -246,12 +252,13 @@ func truncateString(s string, maxLen int) string {
 func TestEdgeCases(t *testing.T) {
 	// Test with empty data
 	key, _ := GenerateKey(32)
-	encrypted, err := Encrypt([]byte{}, key)
+	key64 := KeyToBase64(key)
+	encrypted, err := Encrypt([]byte{}, key64)
 	if err != nil {
 		t.Fatalf("Failed to encrypt empty data: %v", err)
 	}
 
-	decrypted, err := Decrypt(encrypted, key)
+	decrypted, err := Decrypt(encrypted, key64)
 	if err != nil {
 		t.Fatalf("Failed to decrypt empty data: %v", err)
 	}
@@ -266,12 +273,12 @@ func TestEdgeCases(t *testing.T) {
 		largeData[i] = byte(i % 256)
 	}
 
-	encrypted, err = Encrypt(largeData, key)
+	encrypted, err = Encrypt(largeData, key64)
 	if err != nil {
 		t.Fatalf("Failed to encrypt large data: %v", err)
 	}
 
-	decrypted, err = Decrypt(encrypted, key)
+	decrypted, err = Decrypt(encrypted, key64)
 	if err != nil {
 		t.Fatalf("Failed to decrypt large data: %v", err)
 	}
@@ -316,14 +323,15 @@ func TestKeyManipulation(t *testing.T) {
 					name, len(key), size)
 			}
 
+			key64 := KeyToBase64(key)
 			// Make sure we can encrypt/decrypt with this key
 			testData := []byte("test data for " + name)
-			encrypted, err := Encrypt(testData, key)
+			encrypted, err := Encrypt(testData, key64)
 			if err != nil {
 				t.Fatalf("Failed to encrypt with %s key: %v", name, err)
 			}
 
-			decrypted, err := Decrypt(encrypted, key)
+			decrypted, err := Decrypt(encrypted, key64)
 			if err != nil {
 				t.Fatalf("Failed to decrypt with %s key: %v", name, err)
 			}
@@ -349,8 +357,10 @@ func TestNestedDirectories(t *testing.T) {
 	testData := []byte("apiVersion: v1\nkind: Config\n")
 	key, _ := GenerateKey(32)
 
+	key64 := KeyToBase64(key)
+
 	// Encrypt data
-	encrypted, err := Encrypt(testData, key)
+	encrypted, err := Encrypt(testData, key64)
 	if err != nil {
 		t.Fatalf("Failed to encrypt: %v", err)
 	}

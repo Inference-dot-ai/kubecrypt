@@ -24,12 +24,15 @@ func EncryptFile(inputPath string, key []byte) (string, error) {
 		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
-	return Encrypt(data, key)
+	key64 := KeyToBase64(key)
+
+	return Encrypt(data, key64)
 }
 
 // DecryptToFile decrypts ciphertext and writes it to a file
 func DecryptToFile(encryptedText string, outputPath string, key []byte) error {
-	plaintext, err := Decrypt(encryptedText, key)
+	key64 := KeyToBase64(key)
+	plaintext, err := Decrypt(encryptedText, key64)
 	if err != nil {
 		return err
 	}

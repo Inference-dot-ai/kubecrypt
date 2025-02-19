@@ -10,7 +10,12 @@ import (
 )
 
 // Encrypt encrypts plaintext using AES-GCM with the provided key
-func Encrypt(plaintext []byte, key []byte) (string, error) {
+func Encrypt(plaintext []byte, skey string) (string, error) {
+	key, err := KeyFromBase64(skey)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode key: %w", err)
+	}
+
 	// Validate key length (AES-128, AES-192, or AES-256)
 	if len(key) != 16 && len(key) != 24 && len(key) != 32 {
 		return "", ErrInvalidKey
@@ -40,7 +45,12 @@ func Encrypt(plaintext []byte, key []byte) (string, error) {
 }
 
 // Decrypt decrypts ciphertext using AES-GCM with the provided key
-func Decrypt(encryptedText string, key []byte) ([]byte, error) {
+func Decrypt(encryptedText string, skey string) ([]byte, error) {
+	key, err := KeyFromBase64(skey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode key: %w", err)
+	}
+
 	// Validate key length
 	if len(key) != 16 && len(key) != 24 && len(key) != 32 {
 		return nil, ErrInvalidKey
