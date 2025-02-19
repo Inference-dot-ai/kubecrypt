@@ -49,7 +49,7 @@ kubecrypt genkey -size 16 -out /path/to/keyfile
 kubecrypt encrypt -in ~/.kube/config -out encrypted_config.txt -keyfile /path/to/keyfile
 
 # Encrypt using a key provided as base64
-kubecrypt encrypt -in ~/.kube/config -keyfile "BASE64_ENCODED_KEY"
+kubecrypt encrypt -in ~/.kube/config -key "BASE64_ENCODED_KEY"
 
 # Print encrypted output to stdout
 kubecrypt encrypt -in ~/.kube/config -keyfile /path/to/keyfile
