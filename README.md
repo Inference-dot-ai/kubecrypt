@@ -107,36 +107,3 @@ Ifunc main() {
 	}
 }
 ```
-
-## Security Best Practices
-
-1. **Key Management**:
-   - Store keys securely (e.g., HashiCorp Vault, Kubernetes Secrets, AWS KMS)
-   - Use different keys for different environments
-   - Rotate keys periodically
-
-2. **Access Control**:
-   - Limit access to encryption/decryption operations
-   - Implement proper authentication for your API service
-   - Log all encryption/decryption operations
-
-3. **Operational Security**:
-   - Don't store the plaintext and encrypted configs in the same location
-   - Set appropriate file permissions (0600) for key files
-   - Consider using a KMS service in production environments
-
-## Ideal Workflow
-
-1. DevOps team provides kubeconfig for cluster
-2. Security/Dev team uses KubeCrypt to encrypt with environment-specific key
-3. Encrypted config is stored in the database
-4. API service decrypts config at runtime using the environment key
-5. Decrypted config is used temporarily in memory for Kubernetes operations
-
-## License
-
-MIT
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
