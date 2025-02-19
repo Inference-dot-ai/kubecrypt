@@ -20,14 +20,14 @@ It uses AES-GCM encryption with environment-specific keys to ensure that sensiti
 
 ```bash
 # Install the CLI tool
-go install github.com/inference-dot-ai/kubecrypt/cmd/kubecrypt@latest
+go install github.com/Inference-dot-ai/kubecrypt/cmd/kubecrypt@latest
 ```
 
 ### Library
 
 ```bash
 # Add the library to your Go project
-go get github.com/inference-dot-ai/kubecrypt
+go get github.com/Inference-dot-ai/kubecrypt
 ```
 
 ## CLI Usage
@@ -63,6 +63,9 @@ kubecrypt decrypt -in encrypted_config.txt -out ~/.kube/config -keyfile /path/to
 
 # Decrypt an encrypted string instead of a file
 kubecrypt decrypt -string -in "ENCRYPTED_TEXT" -out ~/.kube/config -keyfile /path/to/keyfile
+
+# Decrypt using key 
+kubecrypt decrypt -in encrypted_config.txt -out ./decrypted_file.txt -key "BASE64_ENCODED_KEY"
 ```
 
 ## Library Usage
