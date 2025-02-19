@@ -20,14 +20,14 @@ It uses AES-GCM encryption with environment-specific keys to ensure that sensiti
 
 ```bash
 # Install the CLI tool
-go install github.com/inference-dot-ai/kubecrypt/cmd/kubecrypt@latest
+go install github.com/Inference-dot-ai/kubecrypt/cmd/kubecrypt@latest
 ```
 
 ### Library
 
 ```bash
 # Add the library to your Go project
-go get github.com/inference-dot-ai/kubecrypt
+go get github.com/Inference-dot-ai/kubecrypt
 ```
 
 ## CLI Usage
@@ -67,8 +67,7 @@ kubecrypt decrypt -string -in "ENCRYPTED_TEXT" -out ~/.kube/config -keyfile /pat
 
 ## Library Usage
 
-```go
-package main
+```goIpackage main
 
 import (
 	"fmt"
@@ -76,12 +75,11 @@ import (
 
 	"github.com/yourorg/kubecrypt"
 )
-
-func main() {
+Ifunc main() {
 	// Generate a new key
 	key, err := kubecrypt.GenerateKey(32) // AES-256
 	if err != nil {
-		log.Fatalf("Failed to generate key: %v", err)
+	Ilog.Fatalf("Failed to generate key: %v", err)
 	}
 	
 	// Convert key to base64 for storage/transmission
@@ -91,13 +89,13 @@ func main() {
 	// Later, retrieve the key
 	retrievedKey, err := kubecrypt.KeyFromBase64(keyBase64)
 	if err != nil {
-		log.Fatalf("Failed to decode key: %v", err)
+	Ilog.Fatalf("Failed to decode key: %v", err)
 	}
 	
 	// Encrypt a kubeconfig file
 	encryptedConfig, err := kubecrypt.EncryptFile("/path/to/kubeconfig", retrievedKey)
 	if err != nil {
-		log.Fatalf("Failed to encrypt: %v", err)
+	Ilog.Fatalf("Failed to encrypt: %v", err)
 	}
 	
 	// Store encryptedConfig in database...
