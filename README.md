@@ -53,6 +53,9 @@ kubecrypt encrypt -in ~/.kube/config -key "BASE64_ENCODED_KEY"
 
 # Print encrypted output to stdout
 kubecrypt encrypt -in ~/.kube/config -keyfile /path/to/keyfile
+
+kubecrypt encrypt -key "BASE64_ENCODED_KEY"  -string -in  "ENCRYPTED_TEXT" 
+
 ```
 
 ### Decrypt a Kubeconfig File
@@ -66,6 +69,9 @@ kubecrypt decrypt -string -in "ENCRYPTED_TEXT" -out ~/.kube/config -keyfile /pat
 
 # Decrypt using key 
 kubecrypt decrypt -in encrypted_config.txt -out ./decrypted_file.txt -key "BASE64_ENCODED_KEY"
+
+kubecrypt decrypt -key "BASE64_ENCODED_KEY"  -string -in  "ENCRYPTED_TEXT"
+
 ```
 
 ## Library Usage
