@@ -28,6 +28,7 @@ func main() {
 	encryptOutput := encryptCmd.String("out", "", "Output file path (optional, prints to stdout if not specified)")
 	encryptKey := encryptCmd.String("key", "", "Base64-encoded encryption key (required unless --keyfile is used)")
 	encryptKeyFile := encryptCmd.String("keyfile", "", "File containing the encryption key (required unless --key is used)")
+	encryptString := encryptCmd.Bool("string", false, "Treat input as a kubeconfig string instead of a file")
 
 	// Define decrypt command flags
 	decryptInput := decryptCmd.String("in", "", "Input encrypted file or string (required)")
@@ -50,7 +51,7 @@ func main() {
 	switch os.Args[1] {
 	case "encrypt":
 		encryptCmd.Parse(os.Args[2:])
-		runEncrypt(encryptCmd, *encryptInput, *encryptOutput, *encryptKey, *encryptKeyFile)
+		runEncrypt(encryptCmd, *encryptInput, *encryptOutput, *encryptKey, *encryptKeyFile, *encryptString)
 	case "decrypt":
 		decryptCmd.Parse(os.Args[2:])
 		runDecrypt(decryptCmd, *decryptInput, *decryptOutput, *decryptKey, *decryptKeyFile, *decryptString)
@@ -82,7 +83,7 @@ func printUsage() {
 	fmt.Println("\nRun 'kubecrypt <command> -h' for specific command help")
 }
 
-func runEncrypt(cmd *flag.FlagSet, inputPath, outputPath, keyStr, keyFilePath string) {
+func runEncrypt(cmd *flag.FlagSet, inputPath, outputPath, keyStr, keyFilePath string, isString bool) {
 	if inputPath == "" {
 		fmt.Println("Error: Input file is required")
 		cmd.PrintDefaults()
@@ -95,10 +96,20 @@ func runEncrypt(cmd *flag.FlagSet, inputPath, outputPath, keyStr, keyFilePath st
 		os.Exit(1)
 	}
 
-	encryptedText, err := kubecrypt.EncryptFile(inputPath, key)
-	if err != nil {
-		fmt.Printf("Error encrypting file: %v\n", err)
-		os.Exit(1)
+	var encryptedText string
+	if isString {
+		key64 := kubecrypt.KeyToBase64(key)
+		encryptedText, err = kubecrypt.Encrypt([]byte(inputPath), key64)
+		if err != nil {
+			fmt.Printf("Error encrypting text: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
+		encryptedText, err = kubecrypt.EncryptFile(inputPath, key)
+		if err != nil {
+			fmt.Printf("Error encrypting file: %v\n", err)
+			os.Exit(1)
+		}
 	}
 
 	if outputPath == "" {
@@ -116,7 +127,7 @@ func runEncrypt(cmd *flag.FlagSet, inputPath, outputPath, keyStr, keyFilePath st
 }
 
 func runDecrypt(cmd *flag.FlagSet, inputPath, outputPath, keyStr, keyFilePath string, isString bool) {
-	if (inputPath == "" && !isString) || outputPath == "" {
+	if inputPath == "" && !isString {
 		fmt.Println("Error: Both input and output paths are required")
 		cmd.PrintDefaults()
 		os.Exit(1)
@@ -139,11 +150,22 @@ func runDecrypt(cmd *flag.FlagSet, inputPath, outputPath, keyStr, keyFilePath st
 		}
 		encryptedText = strings.TrimSpace(string(data))
 	}
-
-	err = kubecrypt.DecryptToFile(encryptedText, outputPath, key)
-	if err != nil {
-		fmt.Printf("Error decrypting: %v\n", err)
+	if outputPath == "" {
+		fmt.Println(encryptedText)
+		text, err := kubecrypt.Decrypt(encryptedText, kubecrypt.KeyToBase64(key))
+		if err != nil {
+			fmt.Printf("Error decrypting: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println(string(text))
 		os.Exit(1)
+	} else {
+		err = kubecrypt.DecryptToFile(encryptedText, outputPath, key)
+		if err != nil {
+			fmt.Printf("Error decrypting: %v\n", err)
+			os.Exit(1)
+		}
+
 	}
 
 	fmt.Printf("Successfully decrypted to %s\n", outputPath)
